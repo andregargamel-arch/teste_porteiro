@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contato do Morador</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a class="link" href="/">← Voltar</a>
+        <h2>Contato do Morador</h2>
+      </header>
+
+      <section class="card">
+        <div class="row">
+          <div class="label">Nome</div>
+          <div class="value">{{ resident.full_name }}</div>
+        </div>
+        <div class="row">
+          <div class="label">Apartamento</div>
+          <div class="value">{{ resident.apartment_label }}</div>
+        </div>
+        <div class="row">
+          <div class="label">Telefone</div>
+          <div class="value">{{ resident.phone_raw }}</div>
+        </div>
+        <div class="row">
+          <div class="label">E-mail</div>
+          <div class="value">{{ resident.email }}</div>
+        </div>
+        {% if resident.note %}
+        <div class="row">
+          <div class="label">Observação</div>
+          <div class="value">{{ resident.note }}</div>
+        </div>
+        {% endif %}
+      </section>
+
+      <section class="card">
+        <h3>Enviar Mensagem via WhatsApp</h3>
+        <form method="post" action="{{ url_for('whatsapp_send') }}">
+          <input type="hidden" name="nome" value="{{ resident.full_name }}" />
+          <input type="hidden" name="apto" value="{{ resident.apartment }}" />
+          <div class="field-group">
+            <label for="mensagem">Mensagem</label>
+            <textarea id="mensagem" name="mensagem" rows="4" placeholder="Digite a mensagem"></textarea>
+            <div class="suggestions">
+              <span>Sugestões:</span>
+              <button type="button" class="chip" data-msg="Sua encomenda de pizza chegou">Pizza chegou</button>
+              <button type="button" class="chip" data-msg="Visita para o(a) {{ resident.full_name }}">Visita</button>
+              <button type="button" class="chip" data-msg="Correspondência importante na portaria">Correspondência</button>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit" class="primary">Enviar pelo WhatsApp</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <script>
+      const chips = document.querySelectorAll('.chip');
+      const textarea = document.getElementById('mensagem');
+      chips.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const msg = btn.getAttribute('data-msg');
+          textarea.value = msg;
+          textarea.focus();
+        });
+      });
+    </script>
+  </body>
+</html>

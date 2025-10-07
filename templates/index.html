@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Portaria - Comunicação Rápida</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Portaria - Comunicação Rápida</h1>
+      </header>
+
+      <section class="search">
+        <form method="get" action="/">
+          <div class="field-group">
+            <label for="nome">Nome Completo</label>
+            <input id="nome" name="nome" type="text" placeholder="Digite o nome" value="{{ query_name }}" autofocus />
+          </div>
+          <div class="field-group">
+            <label for="apto">Número do Apartamento</label>
+            <input id="apto" name="apto" type="text" placeholder="Ex: 101 ou A-101" value="{{ query_apto }}" />
+          </div>
+          <div class="actions">
+            <button type="submit" class="primary">Pesquisar</button>
+            <a class="secondary" href="/">Limpar</a>
+          </div>
+        </form>
+      </section>
+
+      {% if results %}
+      <section class="results">
+        <ul>
+          {% for r in results %}
+          <li>
+            <div class="res-card">
+              <div class="res-main">
+                <div class="res-name">{{ r.full_name }}</div>
+                <div class="res-apto">{{ r.apartment_label }}</div>
+              </div>
+              <div class="res-actions">
+                <a class="link" href="{{ url_for('resident_detail', nome=r.full_name, apto=r.apartment) }}">Detalhes</a>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% elif query_name or query_apto %}
+        <p class="muted">Nenhum morador encontrado.</p>
+      {% else %}
+        <p class="muted">Busque por nome e/ou apartamento.</p>
+      {% endif %}
+    </div>
+  </body>
+</html>
