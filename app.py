@@ -1,7 +1,7 @@
 import os
+import csv
 import urllib.parse
 from flask import Flask, render_template, request, redirect, url_for
-import pandas as pd
 
 app = Flask(__name__)
 
@@ -45,8 +45,6 @@ def load_residents():
         _residents_cache = []
         return _residents_cache
 
-    df = pd.read_csv(CSV_PATH)
-
     # Expected columns in Portuguese CSV
     expected = [
         "Nome do Morador",
@@ -56,22 +54,27 @@ def load_residents():
         "E-mail",
         "Mensagem Personalizada",
     ]
-    missing = [c for c in expected if c not in df.columns]
-    if missing:
-        raise RuntimeError(f"CSV missing required columns: {missing}")
 
     residents = []
-    for _, row in df.iterrows():
-        residents.append(
-            Resident(
-                full_name=str(row.get("Nome do Morador", "")).strip(),
-                phone_raw=str(row.get("Telefone com DDD", "")).strip(),
-                block=str(row.get("Bloco", "")).strip(),
-                apartment=str(row.get("Apartamento", "")).strip(),
-                email=str(row.get("E-mail", "")).strip(),
-                note=str(row.get("Mensagem Personalizada", "")).strip(),
+    with open(CSV_PATH, "r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        if not reader.fieldnames:
+            _residents_cache = []
+            return _residents_cache
+        missing = [c for c in expected if c not in reader.fieldnames]
+        if missing:
+            raise RuntimeError(f"CSV missing required columns: {missing}")
+        for row in reader:
+            residents.append(
+                Resident(
+                    full_name=str(row.get("Nome do Morador", "")).strip(),
+                    phone_raw=str(row.get("Telefone com DDD", "")).strip(),
+                    block=str(row.get("Bloco", "")).strip(),
+                    apartment=str(row.get("Apartamento", "")).strip(),
+                    email=str(row.get("E-mail", "")).strip(),
+                    note=str(row.get("Mensagem Personalizada", "")).strip(),
+                )
             )
-        )
 
     _residents_cache = residents
     return residents
